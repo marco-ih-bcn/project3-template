@@ -1,28 +1,27 @@
-require('dotenv').config()
+require('dotenv/config')
 
 var createError = require('http-errors');
 var express = require('express');
 
-var indexRouter = require('./routes/index');
+var apiRouter = require('./routes/api');
 var usersRouter = require('./routes/users');
 
-var app = express();
+var server = express();
 
 // Functional curling style of loading configuration
 require('./config/db')
-require('./config/global')(app)
+require('./config/global')(server)
 
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+server.use('/api', apiRouter);
+server.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+server.use(function(req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+server.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -32,4 +31,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+module.exports = server;
