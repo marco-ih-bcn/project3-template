@@ -1,9 +1,21 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+const User = require("../models/User.model")
+const Service = require("../services/service")
+
+/* GET list of Users. */
+router.get('/', (req, res)=> {
+  User.find().then((users)=>
+  res.json({ title: 'Express', users})
+  )
+});
+
+/* Fill all the Users CRUD Routes */
+router.post('/', (req, res)=> {
+  User.create().then((newUser)=>
+  res.json({ title: 'Express', user: newUser})
+);
 });
 
 module.exports = router;

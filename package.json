@@ -2,9 +2,12 @@
   "name": "project2-template",
   "version": "0.0.0",
   "private": true,
+  "workspaces": ["client"],
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "nodemon ./bin/www"
+    "start": "npm run build -w client&&node ./bin/www",
+    "dev:all": "concurrently \"PORT=3000 nodemon ./bin/www\" \"PORT=5000 npm run start -w client\"",
+    "dev:front": "PORT=5000 npm run start -w client",
+    "dev:back": "PORT=3000 nodemon ./bin/www"
   },
   "dependencies": {
     "axios": "^0.21",
@@ -25,6 +28,7 @@
   },
   "devDependencies": {
     "debug": "^2",
-    "nodemon": "^2"
+    "nodemon": "^2",
+    "concurrently": "^6"
   }
 }

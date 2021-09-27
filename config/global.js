@@ -9,34 +9,41 @@ const favicon = require("serve-favicon");
 const path = require("path");
 
 const session = require('express-session');
+
+const cors = require("cors")
+
 const MongoStore = require('connect-mongo');
 
-const hbs = require('hbs')
-
 // Middleware configuration
-module.exports = (app) => {
+module.exports = (server) => {
+	
+  // Because this is a server that will accept requests from outside and it will be hosted ona server with a `proxy`, express needs to know that it should trust that setting.
+  // Services like heroku use something called a proxy and you need to add this to your server
+  server.set("trust proxy", 1);
+
+  // Setup cors to allow split refresh with nodemon in development.
+  // The value of localhost:5000 is hard coded. The port (:5000) must match what is set for the create-react-app start script.
+  server.use(
+    cors({
+      origin: ["http://localhost:5000"],
+    })
+  );
+
   // In development environment the app logs
-  app.use(logger("dev"));
+  server.use(logger("dev"));
 
   // To have access to `body` property in the request
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
-  app.use(cookieParser());
-
-  // Normalizes the path to the views folder
-  app.set("views", path.join(__dirname, "..", "views"));
-  // Sets the view engine to handlebars
-  app.set("view engine", "hbs");
-
-  hbs.registerPartials(path.join(__dirname, '/views/partials'))
+  server.use(express.json());
+  server.use(express.urlencoded({ extended: false }));
+  server.use(cookieParser());
 
   // Handles access to the public folder
-  app.use(express.static(path.join(__dirname, "..", "public")));
+  server.use(express.static(path.join(__dirname, "..", "client", "build")));
 
   // Handles access to the favicon
-  app.use(favicon(path.join(__dirname, "..", "public", "images", "favicon.ico")));
+  // app.use(favicon(path.join(__dirname, "..", "public", "images", "favicon.ico")));
 
-  app.use(
+  server.use(
 		session({
 			secret: 'Globtrotters-secret',
 			resave: false,
@@ -45,7 +52,7 @@ module.exports = (app) => {
 				maxAge: 24 * 60 * 60 * 1000
 			},
 			store: MongoStore.create({
-				mongoUrl: `${process.env.MONGODB_URI}/${process.env.DB_NAME}`
+				mongoUrl: `${process.env.MONGODB_URL}/${process.env.DB_NAME}`
 			})
 		})
 	);
