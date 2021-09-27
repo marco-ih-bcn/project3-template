@@ -9,10 +9,26 @@ const favicon = require("serve-favicon");
 const path = require("path");
 
 const session = require('express-session');
+
+const cors = require("cors")
+
 const MongoStore = require('connect-mongo');
 
 // Middleware configuration
 module.exports = (server) => {
+	
+  // Because this is a server that will accept requests from outside and it will be hosted ona server with a `proxy`, express needs to know that it should trust that setting.
+  // Services like heroku use something called a proxy and you need to add this to your server
+  server.set("trust proxy", 1);
+
+  // Setup cors to allow split refresh with nodemon in development.
+  // The value of localhost:5000 is hard coded. The port (:5000) must match what is set for the create-react-app start script.
+  server.use(
+    cors({
+      origin: ["http://localhost:5000"],
+    })
+  );
+
   // In development environment the app logs
   server.use(logger("dev"));
 
